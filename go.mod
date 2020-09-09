@@ -1,4 +1,4 @@
-module DownloadManager
+module github.com/tfriedrichs/godl
 
 go 1.15
 

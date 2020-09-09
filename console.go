@@ -1,4 +1,4 @@
-package main
+package godl
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func trackProgress(ids []string, progress <-chan Progress) {
+func TrackProgress(ids []string, progress <-chan Progress) {
 	tracker := make(map[string]Progress)
 
 	for p := range progress {
@@ -36,5 +36,4 @@ func reportProgress(ids []string, dls map[string]Progress) {
 func progressBar(current int64, total int64) string {
 	pct := int(math.Round(100*float64(current)/float64(total)))
 	return fmt.Sprintf("[%s%s] %3d%% ", strings.Repeat("#", pct), strings.Repeat(" ", 100 - pct), pct)
-
 }

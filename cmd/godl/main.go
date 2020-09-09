@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/tfriedrichs/godl"
 	"os"
 	"time"
 )
@@ -18,10 +19,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	downloads := make([]Request, 0, flag.NArg()/2)
+	downloads := make([]godl.Request, 0, flag.NArg()/2)
 
 	for i := 0; i < flag.NArg(); i +=2 {
-		downloads = append(downloads, Request{
+		downloads = append(downloads, godl.Request{
 			Url:      flag.Arg(i),
 			Filename: flag.Arg(i+1),
 		})
@@ -35,12 +36,11 @@ func main() {
 		ids = append(ids, dl.Filename)
 	}
 
-	progress, err := StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
+	progress, err := godl.StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	trackProgress(ids, progress)
+	godl.TrackProgress(ids, progress)
 	fmt.Printf("Finished downloading in %s\n", time.Since(start))
 }
-

@@ -14,10 +14,9 @@ type Request struct {
 	Filename string
 }
 
-func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Request) (<-chan struct{}, <-chan Progress) {
+func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Request) <-chan Progress {
 
 	wg := &sync.WaitGroup{}
-	done := make(chan struct{})
 	work := make(chan Request, len(requests))
 	progress := make(chan Progress, 3)
 	wg.Add(len(requests))
@@ -27,7 +26,7 @@ func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Requ
 	}
 
 	go func() {
-		defer close(done)
+		defer close(progress)
 		wg.Wait()
 	}()
 
@@ -35,7 +34,7 @@ func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Requ
 		go workDownload(work, progress, reportInterval, wg)
 	}
 
-	return done, progress
+	return progress
 }
 
 func workDownload(requests <-chan Request, progress chan<- Progress, interval time.Duration, wg *sync.WaitGroup) {

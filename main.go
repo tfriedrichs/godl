@@ -29,7 +29,7 @@ func main() {
 	}
 
 	fmt.Println("Starting download.")
-	done, progress := StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
+	progress := StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
 	ids := make([]string, 0, len(downloads))
 
 
@@ -37,23 +37,19 @@ func main() {
 		fmt.Println()
 		ids = append(ids, dl.Filename)
 	}
-	trackProgress(ids, progress, done)
+	trackProgress(ids, progress)
 
 	fmt.Printf("Finished downloading in %s\n", time.Since(start))
 }
 
-func trackProgress(ids []string, progress <-chan Progress, done <-chan struct{}) {
+func trackProgress(ids []string, progress <-chan Progress) {
 	tracker := make(map[string]Progress)
-	for {
-		select {
-		case p := <- progress:
-			tracker[p.Id] = p
-			reportProgress(ids, tracker)
-		case <-done:
-			reportProgress(ids, tracker)
-			return
-		}
+
+	for p := range progress {
+		tracker[p.Id] = p
+		reportProgress(ids, tracker)
 	}
+	reportProgress(ids, tracker)
 }
 
 func reportProgress(ids []string, dls map[string]Progress) {

@@ -29,14 +29,17 @@ func main() {
 
 	ids := make([]string, 0, len(downloads))
 
-
+	fmt.Println("Starting download.")
 	for _, dl := range downloads {
 		fmt.Println()
 		ids = append(ids, dl.Filename)
 	}
 
-	fmt.Println("Starting download.")
-	progress := StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
+	progress, err := StartBatch(*simDownloads, 100 * time.Millisecond, downloads...)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	trackProgress(ids, progress)
 	fmt.Printf("Finished downloading in %s\n", time.Since(start))
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"math"
+	"strings"
 )
 
 func trackProgress(ids []string, progress <-chan Progress) {
@@ -26,7 +28,13 @@ func reportProgress(ids []string, dls map[string]Progress) {
 		} else if p.Current == p.Total {
 			fmt.Printf("\u001B[2K%s: Finished downloading %s in %s.\n", p.Id, humanize.Bytes(uint64(p.Total)), p.Elapsed)
 		} else {
-			fmt.Printf("\u001B[2K%s: Downloading (%s/%s).\n", p.Id, humanize.Bytes(uint64(p.Current)), humanize.Bytes(uint64(p.Total)))
+			fmt.Printf("\u001B[2K%s: %.0fs %s \n", p.Id, p.Elapsed.Seconds(), progressBar(p.Current, p.Total))
 		}
 	}
+}
+
+func progressBar(current int64, total int64) string {
+	pct := int(math.Round(100*float64(current)/float64(total)))
+	return fmt.Sprintf("[%s%s] %3d%% ", strings.Repeat("#", pct), strings.Repeat(" ", 100 - pct), pct)
+
 }

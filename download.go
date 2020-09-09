@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -14,7 +15,11 @@ type Request struct {
 	Filename string
 }
 
-func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Request) <-chan Progress {
+func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Request) (<-chan Progress, error) {
+
+	if simDownloads < 1 {
+		return nil, fmt.Errorf("must allow at least one simultaneous download")
+	}
 
 	wg := &sync.WaitGroup{}
 	work := make(chan Request, len(requests))
@@ -34,7 +39,7 @@ func StartBatch(simDownloads int, reportInterval time.Duration, requests ...Requ
 		go workDownload(work, progress, reportInterval, wg)
 	}
 
-	return progress
+	return progress, nil
 }
 
 func workDownload(requests <-chan Request, progress chan<- Progress, interval time.Duration, wg *sync.WaitGroup) {
